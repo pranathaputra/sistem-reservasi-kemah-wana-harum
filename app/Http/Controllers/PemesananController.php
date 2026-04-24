@@ -54,9 +54,9 @@ class PemesananController extends Controller
             'jumlah_laki' => $request->jumlah_laki,
             'jumlah_perempuan' => $request->jumlah_perempuan,
             'jumlah_pendamping' => $request->jumlah_pendamping,
-            'status' => 'pending',
-            'status_pembayaran' => 'pending',
-            'status_checkin' => 'belum',
+            'status' => 'Pending',
+            'status_pembayaran' => 'Pending',
+            'status_checkin' => 'Belum',
             'kode_tiket' => null
         ]);
 
