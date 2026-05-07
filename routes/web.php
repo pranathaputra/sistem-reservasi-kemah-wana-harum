@@ -2,16 +2,24 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardPengunjungController;
 use App\Http\Controllers\PemesananController;
-
-
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\DashboardPengunjungController;
+use App\Http\Controllers\DashboardPengelolaController;
+use App\Http\Controllers\CheckinController;
+use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\KegiatanController;
 /*
 |--------------------------------------------------------------------------
-| LANDING PAGE (Dashboard Pengunjung - Public)
+| LANDING PAGE
 |--------------------------------------------------------------------------
 */
+
+Route::get('/', [DashboardPengunjungController::class, 'index'])
+    ->name('home');
 
 Route::get('/dashboard', [DashboardPengunjungController::class, 'index'])
     ->name('dashboard.pengunjung');
@@ -19,131 +27,147 @@ Route::get('/dashboard', [DashboardPengunjungController::class, 'index'])
 
 /*
 |--------------------------------------------------------------------------
-| AUTHENTICATION (Login & Register)
+| AUTH
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])
-    ->name('login');
-
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/register', [AuthController::class, 'showRegisterForm'])
-    ->name('register');
-
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
-
-/*
-|--------------------------------------------------------------------------
-| LOGOUT
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD PENGELOLA (Harus Login)
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/dashboard-pengelola', function () {
-
-    if (Auth::user()->role != 'pengelola') {
-        abort(403);
-    }
-
-    return view('pengelola.dashboard');
-})->middleware('auth')->name('dashboard.pengelola');
-
-Route::get('/admin/pemesanan', function () {
-    return view('pengelola.pemesanan');
-});
-
-/*
-|--------------------------------------------------------------------------
-| FITUR PENGUNJUNG (Harus Login)
+| DASHBOARD PENGELOLA
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('auth')->group(function () {
 
-    /*
-    | Pesan Tempat Kemah
-    */
+    Route::get('/dashboard-pengelola', [DashboardPengelolaController::class, 'index'])
+        ->name('dashboard.pengelola');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| FITUR PENGUNJUNG
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
     Route::get('/pesan-tempat', [PemesananController::class, 'create'])
         ->name('pesan.tempat');
 
     Route::post('/pesan-tempat', [PemesananController::class, 'store'])
         ->name('pesan.tempat.store');
 
-
-    /*
-    | Riwayat Pemesanan (akan dipakai nanti)
-    */
     Route::get('/riwayat-pemesanan', [PemesananController::class, 'index'])
         ->name('riwayat.pemesanan');
 });
-Route::get('/admin/pemesanan', [PemesananController::class, 'adminIndex'])
-    ->middleware('auth')
-    ->name('admin.pemesanan');
 
-use App\Http\Controllers\DashboardPengelolaController;
 
-Route::get('/dashboard-pengelola', [DashboardPengelolaController::class, 'index'])
-    ->middleware('auth')
-    ->name('dashboard.pengelola');
-Route::get('/admin/pemesanan/{id}/approve', [PemesananController::class, 'approve'])
-    ->name('admin.approve');
+/*
+|--------------------------------------------------------------------------
+| PEMBAYARAN
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/admin/pemesanan/{id}/tolak', [PemesananController::class, 'tolak'])
-    ->name('admin.tolak');
+Route::get('/pembayaran/{id}', [PembayaranController::class, 'proses'])
+    ->name('pembayaran.proses');
 
-Route::get('/admin/pemesanan/{id}/checkin', [PemesananController::class, 'checkin'])
-    ->name('admin.checkin');
-Route::get('/admin/checkin', [PemesananController::class, 'formCheckin'])
-    ->name('admin.form.checkin');
+Route::get('/pembayaran/berhasil/{id}', [PembayaranController::class, 'berhasil'])
+    ->name('pembayaran.berhasil');
 
-Route::post('/admin/checkin', [PemesananController::class, 'prosesCheckin'])
-    ->name('admin.proses.checkin');
-Route::get('/admin/jadwal', [PemesananController::class, 'jadwal'])
-    ->name('admin.jadwal');
-Route::get('/admin/pembayaran', [PemesananController::class, 'pembayaran'])
-    ->name('admin.pembayaran');
-Route::get(
-    '/admin/generate-tiket/{id}',
-    [PemesananController::class, 'generateTiket']
-)->name('admin.generate.tiket');
-Route::get('/tiket/{id}', function ($id) {
-    $pemesanan = \App\Models\Pemesanan::findOrFail($id);
-    return view('pengunjung.tiket', compact('pemesanan'));
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AREA
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/admin/pemesanan', [PemesananController::class, 'adminIndex'])
+        ->name('admin.pemesanan');
+
+    Route::get('/admin/jadwal', [PemesananController::class, 'jadwal'])
+        ->name('admin.jadwal');
+
+    Route::get('/admin/pembayaran', [PemesananController::class, 'pembayaran'])
+        ->name('admin.pembayaran');
+
+    Route::get('/admin/generate-tiket/{id}', [PemesananController::class, 'generateTiket'])
+        ->name('admin.generate.tiket');
 });
-Route::get('/admin/checkin', [PemesananController::class, 'formCheckin'])->name('admin.checkin.form');
 
-Route::post('/admin/checkin/proses', [PemesananController::class, 'prosesCheckin'])->name('admin.prosesCheckin');
 
-Route::get(
-    '/admin/generate-tiket/{id}',
-    [App\Http\Controllers\PemesananController::class, 'generateTiket']
-)->name('admin.generate.tiket');
+/*
+|--------------------------------------------------------------------------
+| CHECK-IN QR SCANNER
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/eticket', [DashboardPengunjungController::class, 'eticket'])
-    ->name('pengunjung.eticket');
-Route::get(
-    '/admin/pembayaran/berhasil/{id}',
-    [PemesananController::class, 'pembayaranBerhasil']
-)->name('admin.pembayaran.berhasil');
-Route::get(
-    '/admin/pembayaran/berhasil/{id}',
-    [App\Http\Controllers\PemesananController::class, 'pembayaranBerhasil']
-)->name('admin.pembayaran.berhasil');
-Route::get('/riwayat-pemesanan', [PemesananController::class, 'index'])
-    ->middleware('auth')
-    ->name('riwayat.pemesanan');
+Route::middleware('auth')->group(function () {
 
-Route::get('/', function () {
-    return view('pengunjung.dashboard');
-})->name('home');
+    Route::get('/admin/checkin', [PemesananController::class, 'formCheckin'])
+        ->name('admin.checkin.form');
+
+    Route::post('/admin/checkin/proses', [CheckinController::class, 'proses'])
+        ->name('admin.checkin.proses');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| E-TICKET
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/tiket/{id}', function ($id) {
+
+    $pemesanan = \App\Models\Pemesanan::findOrFail($id);
+
+    return view('pengunjung.eticket', compact('pemesanan'));
+})->name('pengunjung.eticket');
+Route::get('/e-ticket', [PemesananController::class, 'eticketUser'])
+    ->name('pengunjung.eticket.user');
+
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/admin/fasilitas', [FasilitasController::class, 'index'])
+        ->name('admin.fasilitas');
+
+    Route::post('/admin/fasilitas/store', [FasilitasController::class, 'store'])
+        ->name('admin.fasilitas.store');
+
+    Route::post('/admin/fasilitas/update/{id}', [FasilitasController::class, 'update'])
+        ->name('admin.fasilitas.update');
+
+    Route::get('/admin/fasilitas/delete/{id}', [FasilitasController::class, 'destroy'])
+        ->name('admin.fasilitas.delete');
+});
+
+
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/review', [ReviewController::class, 'index'])
+        ->name('pengunjung.review');
+});
+
+Route::prefix('admin')->group(function () {
+
+    Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('admin.kegiatan');
+    Route::get('/kegiatan/create', [KegiatanController::class, 'create'])->name('admin.kegiatan.create');
+    Route::post('/kegiatan/store', [KegiatanController::class, 'store'])->name('admin.kegiatan.store');
+    Route::get('/kegiatan/edit/{id}', [KegiatanController::class, 'edit'])->name('admin.kegiatan.edit');
+    Route::put('/kegiatan/update/{id}', [KegiatanController::class, 'update'])->name('admin.kegiatan.update');
+    Route::delete('/kegiatan/delete/{id}', [KegiatanController::class, 'destroy'])->name('admin.kegiatan.delete');
+});

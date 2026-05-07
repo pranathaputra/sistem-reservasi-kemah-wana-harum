@@ -1,18 +1,34 @@
 @extends('layouts.pengunjung')
+
 @php
+use Carbon\Carbon;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 @endphp
+
 @section('content')
 
 <div class="ticket-wrapper">
 
     @if($pemesanan && $pemesanan->kode_tiket)
 
+    @php
+    $statusTiket = 'Aktif';
+
+    if($pemesanan->status_checkin == 'hadir'){
+    $statusTiket = 'Sudah Digunakan';
+    }
+    elseif($pemesanan->expired_at && now()->gt($pemesanan->expired_at)){
+    $statusTiket = 'Expired';
+    }
+    @endphp
+
+
     <div class="ticket-card">
 
         <h2 class="ticket-title">
-            Reservation Details
+            E-Ticket Reservasi
         </h2>
+
 
         <div class="ticket-section">
 
@@ -47,19 +63,52 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
                     <label>Total Peserta</label>
                     <p>
                         {{ $pemesanan->jumlah_laki
-                    + $pemesanan->jumlah_perempuan
-                    + $pemesanan->jumlah_pendamping }}
++ $pemesanan->jumlah_perempuan
++ $pemesanan->jumlah_pendamping }}
                     </p>
                 </div>
 
                 <div>
-                    <label>Status</label>
-                    <p class="status-active">
-                        Aktif
-                    </p>
+                    <label>Status Tiket</label>
+
+                    @if($statusTiket == 'Aktif')
+                    <p class="status-active">Aktif</p>
+
+                    @elseif($statusTiket == 'Expired')
+                    <p class="status-expired">Expired</p>
+
+                    @else
+                    <p class="status-used">Sudah Digunakan</p>
+                    @endif
+
                 </div>
             </div>
 
+        </div>
+
+
+        <div class="ticket-row">
+            <div>
+                <label>Berlaku Sampai</label>
+
+                @if($pemesanan->expired_at)
+                <p>{{ Carbon::parse($pemesanan->expired_at)->format('d M Y') }}</p>
+                @else
+                <p>-</p>
+                @endif
+
+            </div>
+
+            <div>
+                <label>Status Check-in</label>
+
+                @if($pemesanan->status_checkin == 'hadir')
+                <p class="status-used">Sudah Check-in</p>
+                @else
+                <p class="status-active">Belum Check-in</p>
+                @endif
+
+            </div>
         </div>
 
 
@@ -76,18 +125,14 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
         <div class="ticket-actions">
 
-            <a href="{{ route('dashboard.pengunjung') }}"
+            <a href="{{ route('riwayat.pemesanan') }}"
                 class="btn-cancel">
-
                 Kembali
-
             </a>
 
             <button onclick="window.print()"
                 class="btn-download">
-
                 Download
-
             </button>
 
         </div>
@@ -97,10 +142,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
     @else
 
     <div class="ticket-empty">
-
-        Tiket belum tersedia.
-        Silakan tunggu konfirmasi admin.
-
+        Tiket belum tersedia. Silakan tunggu konfirmasi admin.
     </div>
 
     @endif
@@ -109,8 +151,6 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
 <style>
-    /* WRAPPER */
-
     .ticket-wrapper {
         display: flex;
         justify-content: center;
@@ -118,117 +158,76 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
         padding: 60px 20px;
     }
 
-
-    /* CARD */
-
     .ticket-card {
-
         background: white;
         width: 420px;
         max-width: 100%;
         border-radius: 24px;
         padding: 35px;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-
     }
 
-
-    /* TITLE */
-
     .ticket-title {
-
         text-align: center;
         margin-bottom: 25px;
         font-weight: 600;
-
     }
 
-
-    /* SECTION */
-
     .ticket-section {
-
         border-bottom: 1px dashed #ddd;
         padding-bottom: 20px;
         margin-bottom: 25px;
-
     }
 
-
-    /* ROW */
-
     .ticket-row {
-
         display: flex;
         justify-content: space-between;
         margin-bottom: 15px;
-
     }
-
-
-    /* LABEL */
 
     .ticket-row label {
-
         font-size: 12px;
         color: #888;
-
     }
-
-
-    /* VALUE */
 
     .ticket-row p {
-
         margin: 0;
         font-weight: 500;
-
     }
-
-
-    /* STATUS */
 
     .status-active {
-
         color: #28a745;
         font-weight: 600;
-
     }
 
+    .status-expired {
+        color: #dc3545;
+        font-weight: 600;
+    }
 
-    /* QR AREA */
+    .status-used {
+        color: #6c757d;
+        font-weight: 600;
+    }
 
     .qr-area {
-
         text-align: center;
         margin-top: 10px;
-
     }
 
     .qr-area small {
-
         display: block;
         margin-top: 10px;
         color: #777;
-
     }
 
-
-    /* BUTTON AREA */
-
     .ticket-actions {
-
         display: flex;
         gap: 12px;
         margin-top: 25px;
-
     }
 
-
-    /* BUTTON CANCEL */
-
     .btn-cancel {
-
         flex: 1;
         padding: 12px;
         border-radius: 10px;
@@ -236,14 +235,9 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
         text-decoration: none;
         border: 1px solid #ccc;
         color: #333;
-
     }
 
-
-    /* BUTTON DOWNLOAD */
-
     .btn-download {
-
         flex: 1;
         padding: 12px;
         border: none;
@@ -251,71 +245,41 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
         background: #2f2f4f;
         color: white;
         cursor: pointer;
-
     }
 
 
-    /* MOBILE */
+    @media print {
 
-    @media(max-width:768px) {
+        .header,
+        .sidebar,
+        nav,
+        footer,
+        .ticket-actions {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .ticket-wrapper {
+            padding: 0;
+        }
 
         .ticket-card {
-
-            padding: 25px;
-
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: none;
+            border: 1px solid #ddd;
+            page-break-inside: avoid;
         }
 
-        .ticket-row {
-
-            flex-direction: column;
-            gap: 6px;
-
+        .qr-area svg {
+            width: 160px !important;
+            height: 160px !important;
         }
 
-        .ticket-actions {
-
-            flex-direction: column;
-
-        }
-
-        @media print {
-
-            /* sembunyikan header layout */
-            .header,
-            .sidebar,
-            nav,
-            footer,
-            .ticket-actions {
-                display: none !important;
-            }
-
-            /* hilangkan margin halaman */
-            body {
-                margin: 0;
-            }
-
-            /* card jadi full tengah */
-            .ticket-wrapper {
-                padding: 0;
-            }
-
-            /* ukuran card fix supaya muat 1 halaman */
-            .ticket-card {
-                width: 100%;
-                max-width: 500px;
-                margin: auto;
-                box-shadow: none;
-                border: 1px solid #ddd;
-                page-break-inside: avoid;
-            }
-
-            /* kecilkan QR sedikit supaya muat */
-            .qr-area svg {
-                width: 160px !important;
-                height: 160px !important;
-            }
-
-        }
     }
 </style>
 

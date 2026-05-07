@@ -1,705 +1,1260 @@
 @php
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 @endphp
+
 <!DOCTYPE html>
 <html>
 
 <head>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <title>Dashboard Pengunjung</title>
 
+
     <style>
+        /* ================= GLOBAL ================= */
+
         body {
             margin: 0;
-            font-family: Arial;
+            font-family: 'Segoe UI', sans-serif;
+            background: #ffffff;
             overflow-x: hidden;
-            background: #f4f6f8;
+            padding-top: 80px;
         }
 
-        /* NAVBAR */
+
+        /* ================= NAVBAR ================= */
 
         .navbar {
-            height: auto;
-            margin: 18px 50px;
-            transition: 0.3s ease;
 
+            margin: 18px 50px;
             padding: 14px 40px;
 
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, .95);
             backdrop-filter: blur(10px);
 
             border-radius: 22px;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .08);
 
             position: sticky;
             top: 10px;
+
             z-index: 1100;
-        }
 
-        .navbar-right {
-            margin-left: auto;
-        }
-
-
-        .navbar a {
-            color: #333;
-            text-decoration: none;
-            margin-left: 15px;
-        }
-
-        .navbar-right a:first-child {
-            color: #444;
-            font-weight: 500;
-        }
-
-        .navbar-right a:last-child {
-            background: linear-gradient(135deg, #4CAF50, #2ecc71);
-            color: white;
-            padding: 10px 22px;
-            border-radius: 999px;
-            font-weight: 600;
-            transition: 0.25s ease;
-        }
-
-        .navbar-right a:last-child:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
-        }
-
-        .navbar::after {
-            content: "";
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            height: 1px;
-            background: rgba(0, 0, 0, 0.06);
         }
 
         .navbar-brand {
+
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 15px;
+
+            font-weight: 600;
+            font-size: 20px;
+
         }
 
         .navbar-brand img {
             height: 55px;
-            width: auto;
-            border-radius: 50%;
         }
 
-        .navbar-brand span {
-            margin: 0;
-            padding: 0;
-            line-height: 1;
-            font-size: 20px;
-            font-weight: 600;
+        .navbar-menu {
+
             display: flex;
             align-items: center;
+            gap: 22px;
+
         }
 
-        .hamburger {
-            font-size: 24px;
-            cursor: pointer;
-            margin-right: 15px;
-            color: #2d4f7c;
-        }
+        .navbar-menu a {
 
-
-        /* SIDEBAR */
-
-        .sidebar {
-            position: fixed;
-            top: 100px;
-            left: 0;
-            width: 230px;
-            height: calc(100vh - 100px);
-
-            background: #f8f8f8;
-
-            padding: 25px 20px;
-
-            display: flex;
-            flex-direction: column;
-
-            border-right: 1px solid #e5e5e5;
-
-            transition: transform 0.3s ease;
-        }
-
-
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-top {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        /* SIDEBAR PROFIL */
-
-        .sidebar-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .profile-img {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .profile-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .profile-edit {
-            font-size: 13px;
-            color: #888;
             text-decoration: none;
+            color: #333;
+            font-weight: 500;
+
         }
 
-        .profile-edit:hover {
+        .navbar-menu a:hover {
             color: #4CAF50;
         }
 
-        /* MENU ITEM */
-        .sidebar-menu {
+        .logout-btn {
+
+            background: linear-gradient(135deg, #4CAF50, #2ecc71);
+
+            color: white;
+            padding: 10px 22px;
+
+            border-radius: 999px;
+            text-decoration: none;
+
+            font-weight: 600;
+
+        }
+
+        .navbar-custom {
+
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 90%;
+            max-width: 1200px;
+
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+
+            padding: 15px 40px;
+
+            border-radius: 18px;
+
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+
+            z-index: 999;
+
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-container {
+
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .nav-logo img {
+
+            width: 38px;
+        }
+
+        .nav-menu {
+
+            display: flex;
+            gap: 35px;
+
+            list-style: none;
+        }
+
+        .nav-menu a {
+
+            text-decoration: none;
+            color: #34495e;
+
+            font-weight: 500;
+
+            transition: 0.25s;
+        }
+
+        .nav-menu a:hover {
+
+            color: #27ae60;
+        }
+
+        .nav-user {
+
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            color: #2c3e50;
+        }
+
+        .btn-logout {
+
+            background: #27ae60;
+            border: none;
+
+            padding: 8px 18px;
+            border-radius: 20px;
+
+            color: white;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .btn-logout:hover {
+
+            background: #219150;
+        }
+
+        .navbar-full {
+
+            width: 100%;
+            background: white;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            z-index: 999;
+
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-wrapper {
+
+            max-width: 1300px;
+            margin: auto;
+
+            padding: 14px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* kiri */
+
+        .nav-left {
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .nav-left img {
+
+            width: 38px;
+        }
+
+        /* tengah */
+
+        .nav-center {
+
+            display: flex;
+            gap: 35px;
+
+            list-style: none;
+        }
+
+        .nav-center a {
+
+            text-decoration: none;
+            color: #555;
+
+            font-weight: 500;
+
+            transition: 0.25s;
+        }
+
+        .nav-center a:hover {
+
+            color: #27ae60;
+        }
+
+        /* kanan */
+
+        .nav-right {
+
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .username {
+
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .logout-btn {
+
+            background: #27ae60;
+            border: none;
+
+            padding: 8px 18px;
+
+            border-radius: 8px;
+
+            color: white;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .navbar-main {
+
+            width: 100%;
+            background: #ffffff;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            height: 75px;
+
+            display: flex;
+            align-items: center;
+
+            box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.06);
+
+            z-index: 999;
+        }
+
+        .navbar-container {
+
+            width: 92%;
+            max-width: 1300px;
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* kiri */
+
+        .navbar-left {
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 18px;
+            font-weight: 600;
+
+            color: #2c3e50;
+        }
+
+        .navbar-left img {
+
+            width: 42px;
+            height: auto;
+        }
+
+        /* tengah */
+
+        .navbar-menu {
+
+            display: flex;
+            gap: 40px;
+
+            list-style: none;
+
+            margin: 0;
+        }
+
+        .navbar-menu a {
+
+            text-decoration: none;
+
+            font-weight: 500;
+
+            color: #555;
+
+            transition: 0.25s ease;
+        }
+
+        .navbar-menu a:hover {
+
+            color: #27ae60;
+        }
+
+        /* kanan */
+
+        .navbar-right {
+
+            display: flex;
+            align-items: center;
             gap: 18px;
         }
 
-        .menu-link {
-            text-decoration: none;
-            color: #666;
+        .username {
 
-            font-size: 18px;
-
-            display: flex;
-            align-items: center;
-            gap: 14px;
-
-            transition: 0.2s ease;
+            font-weight: 500;
+            color: #2c3e50;
         }
 
-        .menu-link:hover {
-            color: #222;
-        }
+        .btn-logout {
 
-        .menu-link.active {
-            color: black;
+            background: #27ae60;
+            border: none;
+
+            padding: 8px 20px;
+
+            border-radius: 8px;
+
+            color: white;
+
             font-weight: 600;
-        }
 
-        .sidebar-logout {
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
+            cursor: pointer;
 
-        .menu-link.logout {
-            color: #555;
-        }
-
-        @media (max-width: 768px) {
-
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            .auth-layout .sidebar:not(.collapsed)~#mainContent {
-                margin-left: 0;
-            }
-
-        }
-
-        /* CONTENT */
-
-        .auth-layout #mainContent {
-            margin-left: 0;
-        }
-
-        .auth-layout .sidebar:not(.collapsed)~#mainContent {
-            margin-left: 230px;
-        }
-
-        .auth-layout .sidebar.collapsed~#mainContent {
-            margin-left: 0;
-        }
-
-
-        /* HERO */
-
-        .hero {
-            height: 520px;
-            max-width: 1400px;
-
-            margin: 40px auto 100px auto;
-
-            border-radius: 28px;
-
-            background: url('/images/foto_kemah.jpeg') center/cover no-repeat;
-
-            display: flex;
-            align-items: center;
-
-            padding-left: 90px;
-
-            position: relative;
-            overflow: hidden;
-
-            box-shadow: 0px 30px 80px rgba(0, 0, 0, 0.15);
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-
-            background: linear-gradient(to right,
-                    rgba(0, 0, 0, 0.65),
-                    rgba(0, 0, 0, 0.35),
-                    rgba(0, 0, 0, 0.05));
-        }
-
-        .hero-text {
-            position: relative;
-            max-width: 520px;
-            color: white;
-        }
-
-        .hero-text h1 {
-            font-size: 52px;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        .highlight-text {
-            color: #4CAF50;
-        }
-
-        .hero-subtitle {
-            font-size: 20px;
-            margin-top: 15px;
-        }
-
-        .hero-btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 28px;
-            background: linear-gradient(45deg, #4CAF50, #2ecc71);
-            color: white;
-            border-radius: 30px;
-            text-decoration: none;
-        }
-
-        .hero-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
-        }
-
-        /* CONTENT SECTION */
-
-        .content {
-            padding: 40px;
-        }
-
-        .galeri {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .booking-floating {
-            position: relative;
-            margin-top: -20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .booking-card {
-            width: 85%;
-            max-width: 1400px;
-
-            margin: -70px auto 20px auto;
-            background: #ffffff;
-            padding: 40px 60px;
-
-            border-radius: 24px;
-
-            box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.15);
-
-            text-align: center;
-        }
-
-        .booking-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* FOOTER */
-
-        .footer {
-            background: #111;
-            color: white;
-            padding: 50px 40px 20px;
-            text-align: center;
-        }
-
-        .section-heading {
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .fasilitas-item {
-            border-radius: 15px;
-            padding: 20px;
-            background: #f8f9fa;
             transition: 0.3s ease;
         }
 
-        .fasilitas-item:hover {
-            transform: translateY(-5px);
-            background: #e9f7ef;
+        .btn-logout:hover {
+
+            background: #219150;
         }
 
-        .fasilitas-icon {
-            font-size: 40px;
+        /* supaya konten tidak ketutup navbar */
+
+        body {
+
+            padding-top: 60px;
+        }
+
+        /* ================= HERO FULLSCREEN ================= */
+
+        .hero-fullscreen {
+
+            height: 100vh;
+
+            background-image: url("/images/foto_kemah.jpeg");
+
+            background-size: cover;
+
+            background-position: center;
+
+            display: flex;
+
+            align-items: center;
+
+            padding-left: 120px;
+
+            position: relative;
+
+        }
+
+        /* gradient kiri cinematic */
+
+        .hero-fullscreen::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            top: 0;
+
+            width: 60%;
+            height: 100%;
+
+            background: linear-gradient(to right,
+                    rgba(255, 255, 255, 0.95),
+                    rgba(255, 255, 255, 0.6),
+                    transparent);
+
+        }
+
+        /* overlay teks */
+
+        .hero-overlay {
+
+            position: relative;
+
+            z-index: 2;
+
+            max-width: 600px;
+
+            color: #2c3e50;
+
+        }
+
+        /* subtitle kecil */
+
+        .hero-small-text {
+
+            letter-spacing: 4px;
+
+            font-size: 14px;
+
+            opacity: .8;
+
+            margin-bottom: 10px;
+
+        }
+
+        /* judul besar */
+
+        .hero-overlay h1 {
+
+            font-size: 72px;
+
+            font-weight: 700;
+
+            line-height: 1.1;
+
+            margin-bottom: 20px;
+
+        }
+
+        /* deskripsi */
+
+        .hero-overlay p {
+
+            font-size: 16px;
+
+            opacity: .9;
+
+            margin-bottom: 35px;
+
+        }
+
+        /* tombol outline putih */
+
+        .hero-btn-outline {
+
+            border: 2px solid #27ae60;
+
+            color: #27ae60;
+
+            padding: 12px 30px;
+
+            border-radius: 40px;
+
+            text-decoration: none;
+
+            transition: .3s;
+
+        }
+
+        .hero-btn-outline:hover {
+
+            background: #27ae60;
+
+            color: white;
+
+        }
+
+        /* ================= SIDEBAR MOBILE ================= */
+
+        .hamburger {
+
+            font-size: 24px;
+            cursor: pointer;
+
+            display: none;
+
+        }
+
+        .sidebar {
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            height: 100vh;
+            width: 75%;
+            max-width: 280px;
+
+            background: white;
+
+            transform: translateX(-100%);
+            transition: .3s ease;
+
+            z-index: 1200;
+
+            padding-top: 90px;
+            padding-left: 25px;
+
+        }
+
+        .sidebar.show {
+
+            transform: translateX(0);
+
+            box-shadow: 0 0 40px rgba(0, 0, 0, .25);
+
+        }
+
+        .sidebar a {
+
+            display: block;
+
+            margin-bottom: 18px;
+            font-size: 18px;
+
+            text-decoration: none;
+            color: #333;
+
+        }
+
+        .sidebar a:hover {
             color: #4CAF50;
-            margin-bottom: 12px;
         }
 
-        /* ================= MOBILE RESPONSIVE FINAL ================= */
 
-        @media (max-width: 768px) {
+        /* overlay */
 
-            /* NAVBAR */
+        #sidebarOverlay {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100vh;
+
+            background: rgba(0, 0, 0, .4);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: .3s ease;
+
+            z-index: 1100;
+
+        }
+
+        #sidebarOverlay.show {
+
+            opacity: 1;
+            visibility: visible;
+
+        }
+
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+
+            background: #111;
+            color: white;
+
+            padding: 50px 40px 20px;
+
+            text-align: center;
+
+            margin-top: 80px;
+
+        }
+
+
+        /* ================= MOBILE ================= */
+
+        @media(max-width:768px) {
 
             .navbar {
+
                 margin: 10px 12px;
                 padding: 14px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-                border-radius: 18px;
+
             }
 
-            .navbar-brand {
-                gap: 10px;
+            .navbar-menu {
+                display: none;
             }
 
-            .navbar-brand img {
-                height: 38px;
+            .hamburger {
+                display: block;
             }
 
-            .navbar-brand span {
-                font-size: 15px;
-                line-height: 1.3;
-            }
+            .hero-fullscreen {
 
-            .navbar-right {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 5px;
-            }
-
-            /* HERO SECTION */
-
-            .hero {
-                margin: 20px 12px 30px 12px;
-                padding: 22px;
                 height: auto;
-                border-radius: 18px;
+                padding: 40px 20px;
+
             }
 
-            .hero-text h1 {
-                font-size: 24px;
-                line-height: 1.35;
+            .hero-overlay h1 {
+                font-size: 28px;
             }
 
-            .hero-subtitle {
+            .hero-overlay p {
                 font-size: 14px;
-                margin-top: 10px;
             }
 
-            .hero-btn {
-                margin-top: 15px;
-                padding: 10px 18px;
-                font-size: 14px;
-                display: inline-block;
-            }
+        }
 
-            /* BOOKING STATUS CARD */
+        .booking-wrapper {
+            display: flex;
+            justify-content: center;
 
-            .booking-card {
-                width: 94%;
-                margin: -20px auto 20px auto;
-                padding: 22px;
-                border-radius: 18px;
-            }
+            margin-top: 100px;
+            margin-bottom: 60px;
+        }
 
-            /* CONTENT SECTION */
+        .booking-card {
 
-            .content {
-                padding: 18px;
-            }
+            background: white;
+            padding: 30px 40px;
 
-            /* SIDEBAR MOBILE */
+            border-radius: 16px;
 
-            .sidebar {
-                top: 75px;
-                width: 220px;
-            }
+            box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.06);
 
-            /* FOOTER */
+            max-width: 850px;
+            width: 100%;
 
-            .footer {
-                padding: 25px 12px;
-                font-size: 13px;
-            }
+            text-align: center;
+        }
+
+        .booking-header {
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 10px;
+        }
+
+        .calendar-icon {
+
+            font-size: 22px;
+        }
+
+        .booking-subtitle {
+
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .booking-dates {
+
+            display: flex;
+            flex-wrap: wrap;
+
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .date-badge {
+
+            background: #ffeaea;
+
+            color: #d63031;
+
+            padding: 8px 16px;
+
+            border-radius: 999px;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.25s ease;
+        }
+
+        .date-badge:hover {
+
+            background: #ffd6d6;
+        }
+
+        .availability-wrapper {
+            display: flex;
+            justify-content: center;
+
+            margin-top: 100px;
+            margin-bottom: 60px;
+        }
+
+        .availability-card {
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 35px 40px;
+
+            max-width: 900px;
+            width: 100%;
+
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+        }
+
+        .availability-header {
+
+            display: flex;
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+        .availability-icon {
+
+            font-size: 28px;
+        }
+
+        .availability-header h3 {
+
+            margin: 0;
+        }
+
+        .availability-header p {
+
+            margin: 0;
+            color: #888;
+        }
 
 
+        /* GRID TANGGAL */
 
-            @media (max-width:768px) {
+        .availability-grid {
 
-                .sidebar.show {
-                    box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
-                }
+            display: grid;
 
-            }
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 
-            /* ===== SIDEBAR MOBILE MODERN ===== */
+            gap: 15px;
+        }
 
-            #sidebarOverlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background: rgba(0, 0, 0, 0.4);
-                opacity: 0;
-                visibility: hidden;
-                transition: 0.3s ease;
-                z-index: 1100;
-            }
 
-            #sidebarOverlay.show {
-                opacity: 1;
-                visibility: visible;
-            }
+        /* ITEM */
 
-            /* sidebar mobile animation */
+        .availability-item {
 
-            @media(max-width:768px) {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-                /* SIDEBAR WIDTH MOBILE */
+            background: #fff5f5;
 
-                .sidebar {
-                    top: 0;
-                    left: 0;
-                    height: 100vh;
-                    width: 75%;
-                    max-width: 280px;
-                    background: white;
-                    transform: translateX(-100%);
-                    transition: 0.3s ease;
-                    z-index: 1200;
-                    padding-top: 90px;
-                }
+            border: 1px solid #ffdede;
 
-                /* SIDEBAR ACTIVE */
+            border-radius: 12px;
 
-                .sidebar.show {
-                    transform: translateX(0);
-                    box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
-                }
+            padding: 12px 18px;
 
-                /* MAIN CONTENT TIDAK BERGESER */
+            transition: 0.25s ease;
+        }
 
-                .auth-layout .sidebar:not(.collapsed)~#mainContent {
-                    margin-left: 0 !important;
-                }
+        .availability-item:hover {
 
-            }
+            transform: translateY(-2px);
+
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
+
+
+        /* DOT STATUS */
+
+        .status-dot {
+
+            width: 10px;
+            height: 10px;
+
+            background: #ff4d4d;
+
+            border-radius: 50%;
+        }
+
+
+        /* TEXT */
+
+        .date-text {
+
+            font-weight: 500;
+
+            color: #444;
+
+            flex: 1;
+
+            margin-left: 10px;
+        }
+
+
+        /* LABEL */
+
+        .status-label {
+
+            font-size: 12px;
+
+            background: #ffe0e0;
+
+            color: #d63031;
+
+            padding: 4px 10px;
+
+            border-radius: 6px;
+
+            font-weight: 600;
+        }
+
+        section {
+            margin-top: 80px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* ===== MODERN SECTION ===== */
+
+        .explore-section {
+            padding: 80px 60px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .explore-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            transition: 0.3s;
+        }
+
+        .explore-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .explore-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .explore-text {
+            padding: 15px;
+        }
+
+        /* ===== ACTIVITY ===== */
+
+        .activity-section {
+            padding: 80px 60px;
+            gap: 40px;
+            padding: 80px 60px;
+            align-items: center;
+        }
+
+        .activity-left {
+            max-width: 400px;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+
+        .activity-card {
+            height: 120px;
+            background: url("/images/foto_kemah.jpeg") center/cover;
+            border-radius: 12px;
+        }
+
+        .activity-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 10px;
+        }
+
+        .activity-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .activity-item {
+            min-width: 380px;
+            /* dari 300 → lebih lebar */
+            height: 200px;
+            background: url("/images/foto_kemah.jpeg") center/cover;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        /* wrapper */
+        .activity-wrapper {
+            position: relative;
+        }
+
+        /* scroll */
+        .activity-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            padding: 10px 40px;
+        }
+
+        .activity-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* item */
+        .activity-item {
+            min-width: 380px;
+            height: 200px;
+            background: url("/images/foto_kemah.jpeg") center/cover;
+            border-radius: 16px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            transition: 0.3s;
+        }
+
+        .activity-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* tombol */
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .scroll-btn.left {
+            left: 5px;
+        }
+
+        .scroll-btn.right {
+            right: 5px;
+        }
+
+        .activity-wrapper {
+            position: relative;
+            margin-top: 30px;
+        }
+
+        .activity-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 40px;
+            cursor: grab;
+        }
+
+        .activity-scroll:active {
+            cursor: grabbing;
+        }
+
+        .activity-item {
+            min-width: 380px;
+            height: 200px;
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
     </style>
 
 </head>
 
 
-
-<body class="@auth auth-layout @endauth">
+<body>
 
     <div id="sidebarOverlay"></div>
 
+
     <!-- NAVBAR -->
 
-    <div class="navbar">
+    <nav class="navbar-main">
 
-        @auth
-        <span id="toggleSidebar" class="hamburger">☰</span>
-        @endauth
+        <div class="navbar-container">
 
-        <div class="navbar-brand">
-            <img src="{{ asset('images/logo_wana_harum_nobg.png') }}" alt="Logo">
-            <span>Bumi Perkemahan Wana Harum</span>
-        </div>
-
-        <div class="navbar-right">
-
-            @guest
-            <a href="{{ route('login') }}">Login</a>
-            <a href="{{ route('register') }}">Register</a>
-            @endguest
-
-            @auth
-            {{ Auth::user()->name }}
-            <a href="/logout">Logout</a>
-            @endauth
-
-        </div>
-
-    </div>
-
-
-    @auth
-    <!-- SIDEBAR -->
-    <div id="sidebar" class="sidebar collapsed">
-
-        <!-- PROFILE -->
-        <div class="sidebar-top">
-
-            <div class="sidebar-profile">
-                <img src="{{ asset('storage/' . Auth::user()->foto) }}" class="profile-img">
-
-                <div class="profile-info">
-                    <span class="profile-name">
-                        {{ Auth::user()->name }}
-                    </span>
-
-                    <a href="#" class="profile-edit">
-                        Edit Profil
-                    </a>
-                </div>
+            <!-- LOGO -->
+            <div class="navbar-left">
+                <img src="{{ asset('images/logo_wana_harum_nobg.png') }}" alt="logo">
+                <span>Bumi Perkemahan Wana Harum</span>
             </div>
 
             <!-- MENU -->
-            <div class="sidebar-menu">
+            @auth
 
-                <a href="{{ route('dashboard.pengunjung') }}" class="menu-link active">
-                    <i class="bi bi-house"></i>
-                    Dashboard
-                </a>
+            <!-- MENU SAAT LOGIN -->
+            <ul class="navbar-menu">
+                <li><a href="{{ route('dashboard.pengunjung') }}">Dashboard</a></li>
+                <li><a href="{{ route('pesan.tempat') }}">Pesan Tempat</a></li>
+                <li><a href="{{ route('riwayat.pemesanan') }}">Riwayat</a></li>
+                <li><a href="{{ route('pengunjung.review') }}">Review</a></li>
+            </ul>
 
-                <a href="{{ route('pesan.tempat') }}" class="menu-link">
-                    <i class="bi bi-calendar-check"></i>
-                    Pesan Tempat
-                </a>
+            <div class="navbar-right">
+                <span class="username">
+                    {{ auth()->user()->name }}
+                </span>
 
-                <a href="{{ route('riwayat.pemesanan') }}" class="menu-link">
-                    <i class="bi bi-clock-history"></i>
-                    Riwayat
-                </a>
-
-                <a href="{{ route('pengunjung.eticket') }}" class="menu-link">
-                    <i class="bi bi-ticket-perforated"></i>
-                    E-Ticket
-                </a>
-
-                <a href="#" class="menu-link">
-                    <i class="bi bi-star"></i>
-                    Review
-                </a>
-
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button class="btn-logout">Logout</button>
+                </form>
             </div>
 
-        </div>
+            @else
 
+            <!-- MENU SAAT BELUM LOGIN -->
+            <ul class="navbar-menu">
+                <li><a href="{{ route('login') }}">Login</a></li>
+                <li><a href="{{ route('register') }}">Register</a></li>
+            </ul>
+
+            @endauth
+    </nav>
+
+    <!-- SIDEBAR MOBILE -->
+
+    <div id="sidebar"
+        class="sidebar">
+
+        <a href="{{ route('dashboard.pengunjung') }}">Dashboard</a>
+
+        <a href="{{ route('pesan.tempat') }}">Pesan Tempat</a>
+
+        <a href="{{ route('riwayat.pemesanan') }}">Riwayat</a>
+
+        <a href="{{ route('pengunjung.review') }}">Review</a>
+
+        @auth
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" style="
+        background:none;
+        border:none;
+        color:red;
+        font-size:18px;
+        cursor:pointer;
+        margin-bottom:18px;
+    ">
+                Logout
+            </button>
+        </form>
+        @endauth
     </div>
-    @endauth
 
-    <!-- MAIN CONTENT -->
+
+    <!-- CONTENT -->
 
     <div id="mainContent">
+
         @yield('content')
-        <!-- FOOTER -->
 
         <footer class="footer">
 
-            {{ date('Y') }} Sistem Informasi Pemesanan Tempat Kemah | Wana Harum
+            {{ date('Y') }}
+            Sistem Informasi Pemesanan Tempat Kemah | Wana Harum
 
         </footer>
 
     </div>
-</body>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
 
-        const toggleBtn = document.getElementById("toggleSidebar");
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("sidebarOverlay");
 
-        if (toggleBtn) {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-            toggleBtn.addEventListener("click", function() {
+            const toggleBtn = document.getElementById("toggleSidebar");
 
-                if (window.innerWidth <= 768) {
+            const sidebar = document.getElementById("sidebar");
 
-                    // MODE MOBILE
+            const overlay = document.getElementById("sidebarOverlay");
+
+            if (toggleBtn) {
+
+                toggleBtn.addEventListener("click", function() {
+
                     sidebar.classList.toggle("show");
+
                     overlay.classList.toggle("show");
 
-                } else {
+                });
 
-                    // MODE DESKTOP
-                    sidebar.classList.toggle("collapsed");
+            }
 
-                }
+            if (overlay) {
 
+                overlay.addEventListener("click", function() {
+
+                    sidebar.classList.remove("show");
+
+                    overlay.classList.remove("show");
+
+                });
+
+            }
+
+        });
+    </script>
+    <script>
+        function scrollActivity(direction) {
+            const container = document.getElementById('activityScroll');
+            const scrollAmount = 400;
+            container.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
             });
-
         }
 
-        /* klik overlay tutup sidebar (mobile saja) */
+        /* drag pakai mouse */
+        const slider = document.getElementById('activityScroll');
 
-        if (overlay) {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
 
-            overlay.addEventListener("click", function() {
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
 
-                sidebar.classList.remove("show");
-                overlay.classList.remove("show");
+        slider.addEventListener('mouseleave', () => isDown = false);
+        slider.addEventListener('mouseup', () => isDown = false);
 
-            });
-
-        }
-
-    });
-</script>
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.activity-item').forEach(item => {
+            const bg = item.getAttribute('data-bg');
+            item.style.backgroundImage = `url(${bg})`;
+        });
+    </script>
+</body>
 
 </html>

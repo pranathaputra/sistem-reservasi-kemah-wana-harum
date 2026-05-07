@@ -236,8 +236,18 @@
             <li><a href="{{ route('admin.jadwal') }}">Jadwal Kemah</a></li>
             <li><a href="{{ route('admin.pembayaran') }}">Pembayaran</a></li>
             <li><a href="{{ route('admin.checkin.form') }}">Scan Tiket</a></li>
+            <li>
+                <a href="{{ route('admin.fasilitas') }}">
+                    Kelola Fasilitas
+                </a>
+            </li>
+            
             <li><a href="#">Laporan</a></li>
             <li><a href="#">Review Pengunjung</a></li>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit">Logout</button>
+            </form>
         </ul>
 
     </div>
@@ -266,6 +276,7 @@
         });
     </script>
     @yield('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>

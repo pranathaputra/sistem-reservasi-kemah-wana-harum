@@ -7,6 +7,7 @@ use App\Models\Pemesanan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class PemesananController extends Controller
 {
@@ -42,7 +43,9 @@ class PemesananController extends Controller
         })->exists();
 
         if ($bentrok) {
-            return back()->with('error', 'Tanggal sudah dibooking.');
+            return back()
+                ->withInput()
+                ->with('error', 'Tanggal tersebut sudah dibooking. Silakan pilih tanggal lain.');
         }
 
         // simpan pemesanan
@@ -54,12 +57,12 @@ class PemesananController extends Controller
             'jumlah_laki' => $request->jumlah_laki,
             'jumlah_perempuan' => $request->jumlah_perempuan,
             'jumlah_pendamping' => $request->jumlah_pendamping,
-            'status' => 'Pending',
-            'status_pembayaran' => 'Pending',
-            'status_checkin' => 'Belum',
-            'kode_tiket' => null
+            'status' => 'pending',
+            'status_pembayaran' => 'pending',
+            'status_checkin' => 'belum',
+            'kode_tiket' => null,
+            'expired_at' => now()->addHours(3),
         ]);
-
         // otomatis buat data pembayaran
         DB::table('payments')->insert([
             'pemesanan_id' => $pemesanan->id,
@@ -71,8 +74,7 @@ class PemesananController extends Controller
             'updated_at' => now()
         ]);
 
-        return redirect('/dashboard_pengunjung')
-            ->with('success', 'Pemesanan berhasil!');
+        return redirect()->route('pembayaran.proses', $pemesanan->id);
     }
 
 
@@ -92,41 +94,17 @@ class PemesananController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | APPROVE / TOLAK PEMESANAN
-    |--------------------------------------------------------------------------
-    */
-
-    public function approve($id)
-    {
-        $pemesanan = Pemesanan::findOrFail($id);
-
-        $pemesanan->status = 'disetujui';
-        $pemesanan->save();
-
-        return back();
-    }
-
-
-    public function tolak($id)
-    {
-        $pemesanan = Pemesanan::findOrFail($id);
-
-        $pemesanan->status = 'ditolak';
-        $pemesanan->save();
-
-        return back();
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
     | CHECK-IN QR SCANNER
     |--------------------------------------------------------------------------
     */
 
     public function formCheckin()
     {
-        return view('pengelola.checkin');
+        $totalHadir = Pemesanan::where('status_checkin', 'hadir')
+            ->whereDate('checked_in_at', today())
+            ->count();
+
+        return view('pengelola.checkin', compact('totalHadir'));
     }
 
 
@@ -147,6 +125,7 @@ class PemesananController extends Controller
         }
 
         $pemesanan->status_checkin = 'sudah';
+        $pemesanan->status = 'Digunakan'; // 🔥 tambahan
         $pemesanan->save();
 
         return back()->with('success', 'Check-in berhasil');
@@ -203,7 +182,7 @@ class PemesananController extends Controller
         if (!$pemesanan->kode_tiket) {
 
             $pemesanan->kode_tiket = 'TIKET-' . strtoupper(Str::random(8));
-            $pemesanan->status_checkin = 'belum';
+            $pemesanan->status_checkin = 'Belum';
             $pemesanan->save();
         }
     }
@@ -219,11 +198,12 @@ class PemesananController extends Controller
     {
         $pemesanan = Pemesanan::findOrFail($id);
 
-        // update status di tabel pemesanans
+        // update status pemesanan
         $pemesanan->status_pembayaran = 'berhasil';
+        $pemesanan->status = 'pending'; // 🔥 penting
         $pemesanan->save();
 
-        // update tabel payments juga
+        // update tabel payments
         DB::table('payments')
             ->where('pemesanan_id', $id)
             ->update([
@@ -237,12 +217,57 @@ class PemesananController extends Controller
         return back()->with('success', 'Pembayaran berhasil, tiket otomatis dibuat');
     }
 
+
     public function index()
     {
         $pemesanans = Pemesanan::where('user_id', Auth::id())
             ->latest()
             ->get();
 
+        foreach ($pemesanans as $item) {
+
+            /** @var \App\Models\Pemesanan $item */
+
+            if (
+                $item->status_pembayaran == 'pending' &&
+                now()->gt($item->expired_at)
+            ) {
+                $item->status_pembayaran = 'expired';
+                $item->save();
+            }
+
+            if (
+                $item->status_pembayaran == 'berhasil' &&
+                Carbon::today()->between($item->tanggal_mulai, $item->tanggal_selesai)
+            ) {
+                $item->status = 'Aktif';
+                $item->save();
+            }
+
+            if (
+                Carbon::today()->gt($item->tanggal_selesai) &&
+                $item->status != 'Digunakan'
+            ) {
+                $item->status = 'Expired';
+                $item->save();
+            }
+        }
+
         return view('pengunjung.riwayat', compact('pemesanans'));
+    }
+
+    public function eticketUser()
+    {
+        $pemesanan = Pemesanan::where('user_id', Auth::id())
+            ->where('status_pembayaran', 'lunas')
+            ->latest()
+            ->first();
+
+        if (!$pemesanan) {
+            return redirect()->route('riwayat.pemesanan')
+                ->with('error', 'Belum ada tiket aktif.');
+        }
+
+        return view('pengunjung.eticket', compact('pemesanan'));
     }
 }

@@ -13,7 +13,7 @@
             <th>Status</th>
             <th>Pembayaran</th>
             <th>Check-in</th>
-            <th>Aksi</th>
+           
         </tr>
     </thead>
 
@@ -41,14 +41,6 @@
             <td>{{ $pemesanan->status_checkin }}</td>
 
             <td>
-                <a href="{{ route('admin.approve', $pemesanan->id) }}">✅ Approve</a>
-                <br>
-
-                <a href="{{ route('admin.tolak', $pemesanan->id) }}">❌ Tolak</a>
-                <br>
-
-                <a href="{{ route('admin.checkin', $pemesanan->id) }}">📍 Check-in</a>
-                <br>
 
                 @if($pemesanan->status_pembayaran == 'berhasil' && !$pemesanan->kode_tiket)
                 <a href="{{ route('admin.generate.tiket', $pemesanan->id) }}">
@@ -68,6 +60,7 @@
         </tr>
 
         @endforelse
+        
 
     </tbody>
 </table>

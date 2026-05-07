@@ -8,7 +8,7 @@
             <th>Tanggal Selesai</th>
             <th>Kode Pembayaran</th>
             <th>Status</th>
-            <th>Aksi</th>
+            <th>Status Pembayaran</th>
         </tr>
     </thead>
 
@@ -26,15 +26,19 @@
             <td>
 
                 @if($payment->status == 'pending')
+                <span style="background:orange;color:white;padding:6px 10px;border-radius:6px;">
+                    Pending
+                </span>
 
-                <a href="{{ route('admin.pembayaran.berhasil', $payment->pemesanan_id) }}"
-                    style="background:green;color:white;padding:6px 10px;border-radius:6px;text-decoration:none;">
-                    ✔ Simulasikan Berhasil
-                </a>
+                @elseif($payment->status == 'berhasil')
+                <span style="background:green;color:white;padding:6px 10px;border-radius:6px;">
+                    Berhasil
+                </span>
 
-                @else
-
-                <span style="color:gray;">Sudah Dibayar</span>
+                @elseif($payment->status == 'expired')
+                <span style="background:red;color:white;padding:6px 10px;border-radius:6px;">
+                    Expired
+                </span>
 
                 @endif
 

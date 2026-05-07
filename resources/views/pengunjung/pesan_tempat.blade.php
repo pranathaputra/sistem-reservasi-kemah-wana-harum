@@ -16,7 +16,7 @@
         </div>
         @endif
 
-        <form action="{{ route('pesan.tempat.store') }}" method="POST">
+        <form id="formPesan" action="{{ route('pesan.tempat.store') }}" method="POST">
             @csrf
 
             <div class="row">
@@ -88,8 +88,8 @@
 
             </div>
 
-            <button type="submit" class="btn-submit">
-                Pesan Sekarang
+            <button type="button" onclick="konfirmasiPesan()" class="btn btn-success">
+                Pesan Tempat
             </button>
 
         </form>
@@ -185,5 +185,60 @@
     perempuan.addEventListener("input", hitungTotal);
     pendamping.addEventListener("input", hitungTotal);
 </script>
+<script>
+    function konfirmasiPesan() {
 
+        Swal.fire({
+            title: "Konfirmasi Pemesanan",
+            text: "Apakah data sudah benar dan ingin lanjut ke pembayaran?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Lanjut ke Pembayaran",
+            cancelButtonText: "Edit Kembali"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                document.getElementById("formPesan").submit();
+
+            }
+
+        });
+
+    }
+</script>
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'warning',
+        title: 'Tanggal sudah dibooking',
+        text: 'Silakan pilih tanggal lain'
+    });
+</script>
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'warning',
+        title: 'Tanggal Sudah Dibooking',
+        text: "{{ session('error') }}"
+    });
+</script>
+@endif
+
+@endif
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('error'))
+<script>
+Swal.fire({
+    icon: 'warning',
+    title: 'Tanggal Sudah Dibooking',
+    text: "{{ session('error') }}"
+});
+</script>
+@endif
 @endsection
+
